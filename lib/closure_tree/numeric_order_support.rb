@@ -13,7 +13,7 @@ module ClosureTree
     end
 
     module MysqlAdapter
-      def reorder_with_parent_id(parent_id, minimum_sort_order_value = nil)
+      def reorder_with_parent_id(parent_id, sort_scope_value = nil, minimum_sort_order_value = nil)
         min_where = if minimum_sort_order_value
           "AND #{quoted_order_column} >= #{minimum_sort_order_value}"
         else
@@ -30,7 +30,7 @@ module ClosureTree
     end
 
     module PostgreSQLAdapter
-      def reorder_with_parent_id(parent_id, minimum_sort_order_value = nil)
+      def reorder_with_parent_id(parent_id, sort_scope_value = nil, minimum_sort_order_value = nil)
         min_where = if minimum_sort_order_value
           "AND #{quoted_order_column} >= #{minimum_sort_order_value}"
         else
@@ -54,10 +54,13 @@ module ClosureTree
     end
 
     module GenericAdapter
-      def reorder_with_parent_id(parent_id, minimum_sort_order_value = nil)
+      def reorder_with_parent_id(parent_id, sort_scope_value = nil, minimum_sort_order_value = nil)
         scope = model_class.
           where(parent_column_sym => parent_id).
           order(nulls_last_order_by)
+        if sort_scope_value
+          scope = scope.where("#{where_eq(sort_scope_column, sort_scope_value)}")
+        end
         if minimum_sort_order_value
           scope = scope.where("#{quoted_order_column} >= #{minimum_sort_order_value}")
         end

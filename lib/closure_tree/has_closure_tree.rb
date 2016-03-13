@@ -8,6 +8,7 @@ module ClosureTree
         :hierarchy_table_name,
         :name_column,
         :order,
+        :order_scope_column,
         :touch,
         :with_advisory_lock
       )

@@ -111,5 +111,28 @@ module ClosureTree
       prefix = include_table_name ? "#{quoted_table_name}." : ""
       "#{prefix}#{connection.quote_column_name(order_column)}"
     end
+
+    def order_scope
+      options[:order_scope_column]
+    end
+
+    def order_scope_column
+      o = order_scope
+      if o.nil?
+        nil
+      else
+        o.to_s
+      end
+    end
+
+    def require_order_scope_column
+      raise ":order scope value, '#{options[:order_scope_column]}', isn't a column" if order_scope_column.nil?
+    end
+
+    def order_scope_column_sym
+      require_order_scope_column
+      order_scope_column.to_sym
+    end
+
   end
 end

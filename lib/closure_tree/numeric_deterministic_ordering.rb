@@ -9,20 +9,27 @@ module ClosureTree
       after_destroy :_ct_reorder_siblings
     end
 
+    def _ct_order_scope_value
+      scope_column = _ct.sort_scope_column
+      if scope_column && _ct_parent_id.nil?
+        read_attribute(_ct.sort_scope_column_sym)
+      end
+    end
+
     def _ct_reorder_prior_siblings_if_parent_changed
       if attribute_changed?(_ct.parent_column_name) && !@was_new_record
         was_parent_id = attribute_was(_ct.parent_column_name)
-        _ct.reorder_with_parent_id(was_parent_id)
+        _ct.reorder_with_parent_id(was_parent_id, _ct_order_scope_value)
       end
     end
 
     def _ct_reorder_siblings(minimum_sort_order_value = nil)
-      _ct.reorder_with_parent_id(_ct_parent_id, minimum_sort_order_value)
+      _ct.reorder_with_parent_id(_ct_parent_id, _ct.order_scope_value, minimum_sort_order_value)
       reload unless destroyed?
     end
 
     def _ct_reorder_children(minimum_sort_order_value = nil)
-      _ct.reorder_with_parent_id(_ct_id, minimum_sort_order_value)
+      _ct.reorder_with_parent_id(_ct_id, _ct.order_scope_value, minimum_sort_order_value)
     end
 
     def self_and_descendants_preordered
